@@ -11,6 +11,7 @@ class Mapper():
         with open(_MAP_FILE_NAME) as data:
             reader =  csv.reader(data)
             for entry in reader:
+                print(entry)
                 if len(entry) == 0:
                     continue
                 key = entry[0]
@@ -32,31 +33,17 @@ class Mapper():
         else:
             data = None
             filename = file_entry['filename']
-            file_format = file_entry['format']
-
-            if file_format == 'xls':
+            if file_entry['format'] == 'xls':
                 data = pd.read_excel(filename)
-            elif file_format == 'html':
-                # html puts out a list of datasets, but these are expected to
-                # be simple single-element lists
-                data = pd.read_html(filename)[0]
-                old_label = data.columns.values.tolist()
-                new_label = data.iloc[0].values.tolist()
-
-                relabel = dict(zip(old_label, new_label))
-                data = data.rename(index=str, columns=relabel)
-                data = data.iloc[1:]
-            elif file_format == 'parquet':
+            elif file_entry == 'parquet':
                 data = pd.read_parquet(filename)
             elif file_format == 'csv':
                 data = pd.read_csv(filename)
             else:
-                raise ValueError('bad parser type: {}'.format(file_format))
-            print('Data Loaded')
+                raise ValueError('bad parser type: {}'.format(filename))
             file_entry['dl'] = data
             file_entry['loaded'] = True
-            return data
-
+    
     def list_data_names(self):
         outstring = ""
         for key, value in self._entries.items():
