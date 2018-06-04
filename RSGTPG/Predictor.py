@@ -27,12 +27,12 @@ class Predictor():
 
         #convert Time to time since the start
         dataset['Time'] = pd.to_datetime(dataset['Time'])
-        dataset['Time'] = (dataset['Time']- dataset['Time'].min()) / np.timedelta64(1,'m')
+        dataset['Time'] = (dataset['Time']- dataset['Time'].min()) / np.timedelta64(1,'s')
 
         # Taking care of missing data
         filter = (dataset['Latitude'].notna()) & (dataset['Longitude'].notna()) & (dataset['Time'].notna())
         dataset = dataset[filter]
-
+        
         #set x to location and y to time
         x = dataset.iloc[:, 1:3].values
         y = dataset.iloc[:, 0].values
@@ -63,7 +63,7 @@ class Predictor():
         for file in training_set:
             self.regressors.append(self.train(file))
 
-    def predict(self, lat, long, time_begin):
+    def predict(self, lat, long, time_begin, time_stamp):
         predictions = []
         for regressor in self.regressors:
             #take the lat long and plug it into the model
@@ -76,7 +76,10 @@ class Predictor():
         prediction = np.mean(predictions)
         print (prediction)
         #add prediction to time_begin
-        predicted_time = pd.to_datetime(time_begin) + np.timedelta64(int(prediction), 'm')
+        predicted_time = pd.to_datetime(time_begin) + np.timedelta64(int(prediction), 's')
+        print (predicted_time)
+        time_to_pickup =  (predicted_time - pd.to_datetime(time_stamp)) / np.timedelta64(1,'s')
         #return time
-        return predicted_time
+        return time_to_pickup
 
+        
