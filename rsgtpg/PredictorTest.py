@@ -21,18 +21,18 @@ test_data = []
 for i in range(0,6):
     test_data.append([[inputs['lat'][i], inputs['lng'][i],
                        inputs['route_begin'][i], inputs['timestamp'][i],
-                       inputs['dest_lat'][i], 
+                       inputs['dest_lat'][i],
                        inputs['dest_lng'][i]]])
-    
+
 delta =[]
 
-for test in test_data:  
+for test in test_data:
     for t in test:
         delta.append(predictor.predict(t[0], t[1], t[2], t[3]))
-print (delta) 
+print (delta)
 #get prediction for destination
 predictions = []
-for test in test_data:  
+for test in test_data:
     for t in test:
         predictions.append(predictor.predict(t[4], t[5], t[2], t[3]))
 #subtract delta
