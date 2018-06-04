@@ -32,7 +32,7 @@ class Predictor():
         # Taking care of missing data
         filter = (dataset['Latitude'].notna()) & (dataset['Longitude'].notna()) & (dataset['Time'].notna())
         dataset = dataset[filter]
-        
+
         #set x to location and y to time
         x = dataset.iloc[:, 1:3].values
         y = dataset.iloc[:, 0].values
@@ -82,4 +82,3 @@ class Predictor():
         #return time
         return time_to_pickup
 
-        
