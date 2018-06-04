@@ -14,7 +14,7 @@ predictor = pr.Predictor()
 predictor.load_trainers(1,num_files_training_with)
 #test_data = [[29.99254335, -95.42296647, '12/8/2017 1:33']]
 
-inputs = pd.read_csv('../data/notification_submission.csv')
+inputs = pd.read_csv('../data/notification_submission_dest_coords.csv')
 
 #predict arrival at current spot and store as delta
 test_data = []
@@ -39,4 +39,4 @@ for test in test_data:
 for i in range(0,6):
     predictions[i] = predictions[i]-delta[i]
 print (predictions)
-    
+
