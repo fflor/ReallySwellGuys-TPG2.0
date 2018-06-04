@@ -14,6 +14,8 @@ from mpl_toolkits.mplot3d.axes3d import Axes3D
 import mapper as map
 
 class Predictor():
+    def __init__(self):
+        self.regressors = []
     #creates linear regression model
     def train(self, filekey):
 
@@ -22,11 +24,11 @@ class Predictor():
         dataset = mapr.get_entry(filekey)
         #dataset = pd.read_csv('..\\data\\tele.csv')
         #dataset = pd.read_parquet('..\\data\\data.parquet.gz')
-        
+
         #convert Time to time since the start
         dataset['Time'] = pd.to_datetime(dataset['Time'])
         dataset['Time'] = (dataset['Time']- dataset['Time'].min()) / np.timedelta64(1,'m')
-    
+
         # Taking care of missing data
         filter = (dataset['Latitude'].notna()) & (dataset['Longitude'].notna()) & (dataset['Time'].notna())
         dataset = dataset[filter]
@@ -42,29 +44,33 @@ class Predictor():
         regressor = LinearRegression()
         regressor.fit(x_train, y_train)
 
-
-
 # =============================================================================
-#         #plot
-#         fig = plt.figure()
-#         ax = fig.add_subplot(111, projection='3d')
-#         ax.scatter3D(x[:,0], x[:,1],y)
-#         plt.show()
+         #plot
+        fig = plt.figure()
+        ax = fig.add_subplot(111, projection='3d')
+        ax.scatter3D(x[:,0], x[:,1],y)
+        plt.show()
 # =============================================================================
         return regressor
+
+
     # Predicting the Test set results
-    def predict(self, lat, long, time_begin):
+    def load_trainers(self, first_file, last_file):
         training_set = []
-        for i in range(2,7):
+
+        for i in range(first_file,last_file+1):
             training_set.append('tele'+str(i))
-        predictions = []
         for file in training_set:
-            regressor = self.train(file)
+            self.regressors.append(self.train(file))
+
+    def predict(self, lat, long, time_begin):
+        predictions = []
+        for regressor in self.regressors:
             #take the lat long and plug it into the model
             destination = [[lat,long]]
             #get the predited time from start
             predictions.append(regressor.predict(destination))
-            
+
         #average the predictions
         print (predictions)
         prediction = np.mean(predictions)
