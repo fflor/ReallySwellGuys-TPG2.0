@@ -22,11 +22,11 @@ class Predictor():
         dataset = mapr.get_entry(filekey)
         #dataset = pd.read_csv('..\\data\\tele.csv')
         #dataset = pd.read_parquet('..\\data\\data.parquet.gz')
-
+        
         #convert Time to time since the start
         dataset['Time'] = pd.to_datetime(dataset['Time'])
         dataset['Time'] = (dataset['Time']- dataset['Time'].min()) / np.timedelta64(1,'m')
-
+    
         # Taking care of missing data
         filter = (dataset['Latitude'].notna()) & (dataset['Longitude'].notna()) & (dataset['Time'].notna())
         dataset = dataset[filter]
@@ -44,16 +44,18 @@ class Predictor():
 
 
 
-        #plot
-        fig = plt.figure()
-        ax = fig.add_subplot(111, projection='3d')
-        ax.scatter3D(x[:,0], x[:,1],y)
-        plt.show()
+# =============================================================================
+#         #plot
+#         fig = plt.figure()
+#         ax = fig.add_subplot(111, projection='3d')
+#         ax.scatter3D(x[:,0], x[:,1],y)
+#         plt.show()
+# =============================================================================
         return regressor
     # Predicting the Test set results
     def predict(self, lat, long, time_begin):
         training_set = []
-        for i in range(1,15):
+        for i in range(2,7):
             training_set.append('tele'+str(i))
         predictions = []
         for file in training_set:
@@ -62,14 +64,13 @@ class Predictor():
             destination = [[lat,long]]
             #get the predited time from start
             predictions.append(regressor.predict(destination))
+            
         #average the predictions
+        print (predictions)
         prediction = np.mean(predictions)
+        print (prediction)
         #add prediction to time_begin
-        predicted_time = pd.to_datetime(time_begin) + np.timedelta64(int(prediction[0]), 'm')
+        predicted_time = pd.to_datetime(time_begin) + np.timedelta64(int(prediction), 'm')
         #return time
         return predicted_time
-
-
-
-
 
